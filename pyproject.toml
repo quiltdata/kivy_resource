@@ -13,6 +13,8 @@ kivymd = "^1.1.1"
 
 [tool.poetry.group.dev.dependencies]
 watchdog = "^2.2.1"
+pytest-watch = "^4.2.0"
+flake8 = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]
