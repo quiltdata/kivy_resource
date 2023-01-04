@@ -71,11 +71,11 @@ class ResourceList(MDScreen):
 
         @mainthread
         def _load_data(request, result):
-            book_data = result.get('books', None)
-            if book_data:
+            resource_data = result.get('books', None)
+            if resource_data:
                 authorized = app.is_auth()
-                for book in book_data:
-                    new_book = Resource(book_id=book['id'], text=book['title'], secondary_text=book['author'])
+                for book in resource_data:
+                    new_book = Resource(resource_id=book['id'], text=book['title'], secondary_text=book['author'])
                     new_book.ids.del_btn.disabled = not authorized
                     self.ids.booklist.add_widget(new_book)
 
@@ -100,7 +100,7 @@ class ResourceList(MDScreen):
 
 
 class Resource(MDCardSwipe):
-    book_id = NumericProperty()
+    resource_id = NumericProperty()
     text = StringProperty()
     secondary_text = StringProperty()
 
@@ -115,7 +115,7 @@ class Resource(MDCardSwipe):
         app = MDApp.get_running_app()
         REST_ENDPOINT = os.environ['REST_ENDPOINT']
 
-        fetch(f"{REST_ENDPOINT}/books/{self.book_id}", self.delete_success, method='DELETE', cookie=app.session_cookie)
+        fetch(f"{REST_ENDPOINT}/books/{self.resource_id}", self.delete_success, method='DELETE', cookie=app.session_cookie)
 
     @staticmethod
     def delete_success(request, result):
@@ -127,7 +127,7 @@ class Resource(MDCardSwipe):
         if self.open_progress > 0.0:
             self.dialog.open()
 
-    def handle_edit(self, book_id):
+    def handle_edit(self, resource_id):
         if self.open_progress == 0.0:
             app = MDApp.get_running_app()
-            app.sm.get_screen('edit').open(book_id)
+            app.sm.get_screen('edit').open(resource_id)

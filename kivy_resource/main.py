@@ -106,7 +106,7 @@ class MainApp(MDApp):
         else:
             self.state = {'session': self.session_cookie,
                           'current': self.sm.current,
-                          'edit_id': self.sm.get_screen('edit').book_id,
+                          'edit_id': self.sm.get_screen('edit').resource_id,
                           'edit_title': self.sm.get_screen('edit').ids.title.text,
                           'edit_author': self.sm.get_screen('edit').ids.author.text,
                           }

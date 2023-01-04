@@ -13,7 +13,7 @@
         MDTopAppBar:
             id: app_toolbar
             elevation: widget_elevation
-            title: f"Edit Resource ({'New' if root.book_id is None else str(root.book_id)})"
+            title: f"Edit Resource ({'New' if root.resource_id is None else str(root.resource_id)})"
             anchor_title: "left"
             right_action_items: [["close", root.close]]
 
