@@ -1,4 +1,4 @@
-<BookList>:
+<ResourceList>:
     MDBoxLayout:
         orientation: "vertical"
         md_bg_color: app.theme_cls.bg_dark
@@ -7,7 +7,7 @@
         MDTopAppBar:
             id: app_toolbar
             elevation: widget_elevation
-            title: "All the Books"
+            title: "All the Resources"
             anchor_title: "left"
             right_action_items: [["dots-vertical", lambda ref: app.menu.click(ref)]]
 
@@ -35,7 +35,7 @@
         active: False
 
 
-<Book>:
+<Resource>:
     size_hint_y: None
     height: list_item.height
 

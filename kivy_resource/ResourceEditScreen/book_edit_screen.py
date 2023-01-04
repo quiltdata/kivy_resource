@@ -10,7 +10,7 @@ from kivy_resource.apputils import fetch, Notify, load_kv
 load_kv(__name__)
 
 
-class BookEdit(MDScreen):
+class ResourceEdit(MDScreen):
     book_id = NumericProperty(None, allownone=True)
 
     def open(self, book_id=None):
@@ -18,7 +18,7 @@ class BookEdit(MDScreen):
         authorized = app.is_auth()
         self.ids.save_edit.disabled = not authorized
         for field in self.ids.edit_fields.children:
-            if isinstance(field, Factory.BookField):
+            if isinstance(field, Factory.ResourceField):
                 field.cursor = (0, 0)
                 field.disabled = not authorized
 
@@ -55,7 +55,7 @@ class BookEdit(MDScreen):
         fetch(f"{rest_endpoint}/{rest_resource}", self.save_success, method=method, data=body, cookie=app.session_cookie)
 
     def save_success(self, request, result):
-        Notify(text=f"Book {'added' if self.book_id is None else 'updated'}").open()
+        Notify(text=f"Resource {'added' if self.book_id is None else 'updated'}").open()
         self.clear()
         app = MDApp.get_running_app()
         app.sm.get_screen('books').get_books()

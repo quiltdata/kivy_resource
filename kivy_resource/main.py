@@ -86,7 +86,7 @@ class MainApp(MDApp):
         self.theme_cls.primary_palette = "Teal"
         self.theme_cls.accent_palette = "Pink"
 
-        self.title = "Books"
+        self.title = "Resources"
         self.icon = 'images/icon.png'
 
         Window.bind(on_keyboard=self.keyboard_hook)
