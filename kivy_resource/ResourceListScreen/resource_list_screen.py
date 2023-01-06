@@ -9,10 +9,11 @@ from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivy.properties import NumericProperty, StringProperty
 
-from kivy_resource.apputils import fetch, Notify, load_kv
+from kivy_resource.apputils import Notify, load_kv
+from kivy_resource.client import RestClient
+
 
 load_kv(__name__)
-
 
 class ConfirmDialog(MDDialog):
     def __init__(self, title, text="", on_ok=None):
@@ -57,7 +58,7 @@ class ResourceList(MDScreen):
         app = MDApp.get_running_app()
         authorized = app.is_auth()
         self.show_add_btn(authorized)
-        for book in self.ids.booklist.children:
+        for book in self.ids.resourcelist.children:
             if isinstance(book, Resource):
                 book.ids.del_btn.disabled = not authorized
 
@@ -65,7 +66,7 @@ class ResourceList(MDScreen):
         app = MDApp.get_running_app()
         app.switch_screen('resources')
 
-    def get_books(self):
+    def list_resources(self):
         app = MDApp.get_running_app()
         app.menu.dismiss()
 
@@ -74,29 +75,30 @@ class ResourceList(MDScreen):
             resource_data = result.get('books', None)
             if resource_data:
                 authorized = app.is_auth()
-                for book in resource_data:
-                    new_book = Resource(resource_id=book['id'], text=book['title'], secondary_text=book['author'])
+                for data in resource_data:
+                    fields = RestClient.Default().extract(data)
+                    new_book = Resource(**fields)
                     new_book.ids.del_btn.disabled = not authorized
-                    self.ids.booklist.add_widget(new_book)
+                    self.ids.resourcelist.add_widget(new_book)
 
             self.ids.loading.active = False
 
         @mainthread
         def _clear_data():
             self.ids.loading.active = True
-            self.ids.booklist.clear_widgets()
+            self.ids.resourcelist.clear_widgets()
 
         @mainthread
         def _on_error(*args):
             self.ids.loading.active = False
 
-        def _get_books():
+        def _list_resources():
             Clock.schedule_once(lambda dt: _clear_data(), 0)
 
             rest_endpoint = os.environ['REST_ENDPOINT']
-            fetch(f"{rest_endpoint}/books", _load_data, on_error=_on_error)
+            RestClient.Default().get(_load_data, on_error=_on_error)
 
-        threading.Thread(target=_get_books).start()
+        threading.Thread(target=_list_resources).start()
 
 
 class Resource(MDCardSwipe):
@@ -112,16 +114,13 @@ class Resource(MDCardSwipe):
 
     def do_delete(self):
         self.dialog.dismiss()
-        app = MDApp.get_running_app()
-        REST_ENDPOINT = os.environ['REST_ENDPOINT']
-
-        fetch(f"{REST_ENDPOINT}/books/{self.resource_id}", self.delete_success, method='DELETE', cookie=app.session_cookie)
+        RestClient.Default().delete(self.delete_success, self.resource_id)
 
     @staticmethod
     def delete_success(request, result):
         Notify(text="Resource deleted").open()
         app = MDApp.get_running_app()
-        app.sm.get_screen('resources').get_books()
+        app.sm.get_screen('resources').list_resources()
 
     def handle_delete(self):
         if self.open_progress > 0.0:
